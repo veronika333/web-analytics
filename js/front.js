@@ -1,72 +1,86 @@
-$(function() {
-  var pathname = window.location.pathname;
-  $(document).ready(function() {
-    $(document).on("view:HomePage", function() {
-      console.info("Home Page tracked");
+
+  function getPageName(){
+    var pathname = window.location.pathname;
+    if (pathname.indexOf('index.html') > -1) {
+        return 'HomePage';
+    } else if (pathname.indexOf('detail.html') > -1) {
+        return 'ProductPage';
+    } else if (pathname.indexOf('checkout4.html') > -1) {
+        return 'Checkout4';
+    }
+}
+
+function getProductInfo(){
+    return {
+        productName: $('#productMain h1.text-center').text(),
+        productPrice: $('#productMain .price').text()
+    };
+}
+
+function getCartInfo(){
+    var productInfoEls = $('#checkout table tbody tr');
+    var result = {};
+
+    result.totalPurchase = $('#checkout table tfoot th').eq(1).text();
+    result.userAgent = navigator.userAgent;
+    result.productList = [];
+
+    $.each(productInfoEls, function(index, el){
+        result.productList.push({
+            productName: $(el).children().eq(1).text(),
+            quantity: $(el).children().eq(2).text(),
+            productPrice: $(el).children().eq(3).text(),
+            discount: $(el).children().eq(4).text(),
+            totalPrice: $(el).children().eq(5).text()
+        });
     });
 
-    $(document).on("view:ProductPage", function() {
-      console.info("Product Page tracked");
-    });
+    return result;
+}
 
-    $(document).on("view:Basket", function() {
-      console.info("Basket Page tracked");
-    });
+function getParam(){
+    var pageName = getPageName();
+    var result = null;
 
-    $(document).on("view:Checkout", function() {
-      console.info("Checkout1 tracked");
-    });
-    $(document).on("view:Delivery", function() {
-      console.log("Delivery tracked");
-    });
+    if (pageName === 'ProductPage') {
+        result = getProductInfo();
+        return result;
+    } else if (pageName === 'Checkout4') {
+        result = getCartInfo();
+        return result;
+    }
 
-    $(document).on("view:Payment", function() {
-      console.log("Payment tracked");
-    });
+    return result;
+} 
 
-    if (pathname === "/index.html") {
-      $(document).trigger("view:HomePage");
-    }
-    if (pathname === "/detail.html") {
-      $(document).trigger("view:ProductPage");
-    }
-    if (pathname === "/basket.html") {
-      $(document).trigger("view:Basket");
-    }
-    if (pathname === "/checkout1.html") {
-      $(document).trigger("view:Checkout");
-    }
-    if (pathname === "/checkout2.html") {
-      $(document).trigger("view:Delivery");
-    }
-    if (pathname === "/checkout3.html") {
-      $(document).trigger("view:Payment");
-    }
-    $('.box-footer [type="submit"]').click(function() {
-      $(document).trigger("conversion");
-      console.log("Conversion event triggered");
-    });
-    //the task below
+function triggerPageEvent(){
+    var pageName = getPageName();
+    var params = getParam();
 
-    function getPageName() {
-      var pathname = window.location.pathname;
-      if (pathname === "/index.html") {
-        return "HomePage";
-      } else if (pathname.indexOf("details.html") > -1) {
-        return "ProductPage";
-      } else {
-        return "";
-      }
+    if (pageName === 'Checkout4') {
+        // specific event listener for checkout4 Page
+        $('#checkout button').on('click', function(){
+            $(document).trigger('conversion', params);
+        });
+    } else {
+        $(document).trigger('view:' + pageName, params);
     }
-    if (pageName === "ProductPage") {
-      result = {};
-      result.productName = $("#productMain h1.text-center").text();
-      result.productPrice = $("#productMain .price").text();
-      return result;
-    } else if (pageName === "Checkout") {
-      return result;
-    }
-  });
+}
+
+
+$(document).on('view:ProductPage', function(event, params){
+    console.log('The first parameter that I received is: ');
+    console.log(event);
+
+    console.log('The second parameter that I received is: ')
+    console.log(params);
+
+    // ga('send', 'event', 'ProductPage', 'View', params.productName, {
+    //     nonInteraction: true
+    // });
+});
+
+triggerPageEvent();
   //do not modify code below
   $(".shop-detail-carousel").owlCarousel({
     items: 1,
