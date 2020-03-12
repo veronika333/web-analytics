@@ -1,164 +1,191 @@
+// Google Tag Manager -->
+(function(w, d, s, l, i) {
+  w[l] = w[l] || [];
+  w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+  var f = d.getElementsByTagName(s)[0],
+    j = d.createElement(s),
+    dl = l != "dataLayer" ? "&l=" + l : "";
+  j.async = true;
+  j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+  f.parentNode.insertBefore(j, f);
+})(window, document, "script", "dataLayer", "GTM-P77F3F2");
+// <!-- End Google Tag Manager -->
 
-  function getPageName(){
-    var pathname = window.location.pathname;
-    if (pathname.indexOf('index.html') > -1) {
-        return 'HomePage';
-    } else if (pathname.indexOf('detail.html') > -1) {
-        return 'ProductPage';
-    } else if (pathname.indexOf('checkout4.html') > -1) {
-        return 'Checkout4';
-    }
+function getPageName() {
+  var pathname = window.location.pathname;
+  if (pathname.indexOf("index.html") > -1) {
+    return "HomePage";
+  } else if (pathname.indexOf("detail.html") > -1) {
+    return "ProductPage";
+  } else if (pathname.indexOf("checkout4.html") > -1) {
+    return "Checkout4";
+  }
 }
 
-function getProductInfo(){
-    return {
-        productName: $('#productMain h1.text-center').text(),
-        productPrice: $('#productMain .price').text()
-    };
+function getProductInfo() {
+  return {
+    productName: $("#productMain h1.text-center").text(),
+    productPrice: $("#productMain .price").text()
+  };
 }
 
-function getCartInfo(){
-    var productInfoEls = $('#checkout table tbody tr');
-    var result = {};
+function getCartInfo() {
+  var productInfoEls = $("#checkout table tbody tr");
+  var result = {};
 
-    result.totalPurchase = $('#checkout table tfoot th').eq(1).text();
-    result.userAgent = navigator.userAgent;
-    result.productList = [];
+  result.totalPurchase = $("#checkout table tfoot th")
+    .eq(1)
+    .text();
+  result.userAgent = navigator.userAgent;
+  result.productList = [];
 
-    $.each(productInfoEls, function(index, el){
-        result.productList.push({
-            productName: $(el).children().eq(1).text(),
-            quantity: $(el).children().eq(2).text(),
-            productPrice: $(el).children().eq(3).text(),
-            discount: $(el).children().eq(4).text(),
-            totalPrice: $(el).children().eq(5).text()
-        });
+  $.each(productInfoEls, function(index, el) {
+    result.productList.push({
+      productName: $(el)
+        .children()
+        .eq(1)
+        .text(),
+      quantity: $(el)
+        .children()
+        .eq(2)
+        .text(),
+      productPrice: $(el)
+        .children()
+        .eq(3)
+        .text(),
+      discount: $(el)
+        .children()
+        .eq(4)
+        .text(),
+      totalPrice: $(el)
+        .children()
+        .eq(5)
+        .text()
     });
+  });
 
-    return result;
+  return result;
 }
 
-function getParam(){
-    var pageName = getPageName();
-    var result = null;
+function getParam() {
+  var pageName = getPageName();
+  var result = null;
 
-    if (pageName === 'ProductPage') {
-        result = getProductInfo();
-        return result;
-    } else if (pageName === 'Checkout4') {
-        result = getCartInfo();
-        return result;
-    }
-
+  if (pageName === "ProductPage") {
+    result = getProductInfo();
     return result;
-} 
+  } else if (pageName === "Checkout4") {
+    result = getCartInfo();
+    return result;
+  }
 
-function triggerPageEvent(){
-    var pageName = getPageName();
-    var params = getParam();
-
-    if (pageName === 'Checkout4') {
-        // specific event listener for checkout4 Page
-        $('#checkout button').on('click', function(){
-            $(document).trigger('conversion', params);
-        });
-    } else {
-        $(document).trigger('view:' + pageName, params);
-    }
+  return result;
 }
 
+function triggerPageEvent() {
+  var pageName = getPageName();
+  var params = getParam();
 
-$(document).on('view:ProductPage', function(event, params){
-    console.log('The first parameter that I received is: ');
-    console.log(event);
+  if (pageName === "Checkout4") {
+    // specific event listener for checkout4 Page
+    $("#checkout button").on("click", function() {
+      $(document).trigger("conversion", params);
+    });
+  } else {
+    $(document).trigger("view:" + pageName, params);
+  }
+}
 
-    console.log('The second parameter that I received is: ')
-    console.log(params);
+$(document).on("view:ProductPage", function(event, params) {
+  console.log("The first parameter that I received is: ");
+  console.log(event);
 
-    // ga('send', 'event', 'ProductPage', 'View', params.productName, {
-    //     nonInteraction: true
-    // });
+  console.log("The second parameter that I received is: ");
+  console.log(params);
+
+  // ga('send', 'event', 'ProductPage', 'View', params.productName, {
+  //     nonInteraction: true
+  // });
 });
 
 triggerPageEvent();
-  //do not modify code below
-  $(".shop-detail-carousel").owlCarousel({
-    items: 1,
-    thumbs: true,
-    nav: false,
-    dots: false,
-    loop: true,
-    autoplay: true,
-    thumbsPrerendered: true
-  });
+//do not modify code below
+$(".shop-detail-carousel").owlCarousel({
+  items: 1,
+  thumbs: true,
+  nav: false,
+  dots: false,
+  loop: true,
+  autoplay: true,
+  thumbsPrerendered: true
+});
 
-  $("#main-slider").owlCarousel({
-    items: 1,
-    nav: false,
-    dots: true,
-    autoplay: true,
-    autoplayHoverPause: true,
-    dotsSpeed: 400
-  });
+$("#main-slider").owlCarousel({
+  items: 1,
+  nav: false,
+  dots: true,
+  autoplay: true,
+  autoplayHoverPause: true,
+  dotsSpeed: 400
+});
 
-  $("#get-inspired").owlCarousel({
-    items: 1,
-    nav: false,
-    dots: true,
-    autoplay: true,
-    autoplayHoverPause: true,
-    dotsSpeed: 400
-  });
+$("#get-inspired").owlCarousel({
+  items: 1,
+  nav: false,
+  dots: true,
+  autoplay: true,
+  autoplayHoverPause: true,
+  dotsSpeed: 400
+});
 
-  $(".product-slider").owlCarousel({
-    items: 1,
-    dots: true,
-    nav: false,
-    responsive: {
-      480: {
-        items: 1
-      },
-      765: {
-        items: 2
-      },
-      991: {
-        items: 3
-      },
-      1200: {
-        items: 5
-      }
+$(".product-slider").owlCarousel({
+  items: 1,
+  dots: true,
+  nav: false,
+  responsive: {
+    480: {
+      items: 1
+    },
+    765: {
+      items: 2
+    },
+    991: {
+      items: 3
+    },
+    1200: {
+      items: 5
     }
-  });
+  }
+});
 
-  // productDetailGallery(4000);
-  utils();
+// productDetailGallery(4000);
+utils();
 
-  // ------------------------------------------------------ //
-  // For demo purposes, can be deleted
-  // ------------------------------------------------------ //
+// ------------------------------------------------------ //
+// For demo purposes, can be deleted
+// ------------------------------------------------------ //
 
-  var stylesheet = $("link#theme-stylesheet");
-  $("<link id='new-stylesheet' rel='stylesheet'>").insertAfter(stylesheet);
-  var alternateColour = $("link#new-stylesheet");
+var stylesheet = $("link#theme-stylesheet");
+$("<link id='new-stylesheet' rel='stylesheet'>").insertAfter(stylesheet);
+var alternateColour = $("link#new-stylesheet");
 
-  if ($.cookie("theme_csspath")) {
-    alternateColour.attr("href", $.cookie("theme_csspath"));
+if ($.cookie("theme_csspath")) {
+  alternateColour.attr("href", $.cookie("theme_csspath"));
+}
+
+$("#colour").change(function() {
+  if ($(this).val() !== "") {
+    var theme_csspath = "css/style." + $(this).val() + ".css";
+
+    alternateColour.attr("href", theme_csspath);
+
+    $.cookie("theme_csspath", theme_csspath, {
+      expires: 365,
+      path: document.URL.substr(0, document.URL.lastIndexOf("/"))
+    });
   }
 
-  $("#colour").change(function() {
-    if ($(this).val() !== "") {
-      var theme_csspath = "css/style." + $(this).val() + ".css";
-
-      alternateColour.attr("href", theme_csspath);
-
-      $.cookie("theme_csspath", theme_csspath, {
-        expires: 365,
-        path: document.URL.substr(0, document.URL.lastIndexOf("/"))
-      });
-    }
-
-    return false;
-  });
+  return false;
 });
 
 $(window).on("load", function() {
