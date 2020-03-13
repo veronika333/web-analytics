@@ -11,7 +11,7 @@
 })(window, document, "script", "dataLayer", "GTM-P77F3F2");
 // <!-- End Google Tag Manager -->
 
-function getPageName() {
+/*function getPageName() {
   var pathname = window.location.pathname;
   if (pathname.indexOf("index.html") > -1) {
     return "HomePage";
@@ -21,7 +21,28 @@ function getPageName() {
     return "Checkout4";
   }
 }
-
+function getPageName() {
+  var pathname = window.location.pathname;
+  if (pathname.indexOf("index.html") > -1) {
+    return "HomePage";
+  } else if (pathname.indexOf("detail.html") > -1) {
+    return "ProductPage";
+  } else if (pathname.indexOf("checkout4.html") > -1) {
+    return "Checkout4";
+  }
+}*/
+function getPageName() {
+  var pathname = window.location.pathname;
+  if (pathname.indexOf("index.html") > -1) {
+    return "HomePage";
+  } else if (pathname.indexOf("detail.html") > -1) {
+    return "ProductPage";
+  } else if (pathname.indexOf("checkout4.html") > -1) {
+    return "Checkout4";
+  } else if (pathname.indexOf("basket.html") > -1) {
+    return "Basket";
+  }
+}
 function getProductInfo() {
   return {
     productName: $("#productMain h1.text-center").text(),
@@ -29,19 +50,34 @@ function getProductInfo() {
   };
 }
 
+function generateUniqueId(length) {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 function getCartInfo() {
   var productInfoEls = $("#checkout table tbody tr");
   var result = {};
 
-  result.totalPurchase = $("#checkout table tfoot th")
-    .eq(1)
-    .text();
-  result.userAgent = navigator.userAgent;
-  result.productList = [];
+  result.actionField = {
+    id: generateUniqueId(16),
+    revenue: $("#checkout table tfoot th")
+      .eq(1)
+      .text()
+      .match(/\d+/g)
+      .join(".")
+  };
+
+  result.products = [];
 
   $.each(productInfoEls, function(index, el) {
-    result.productList.push({
-      productName: $(el)
+    result.products.push({
+      name: $(el)
         .children()
         .eq(1)
         .text(),
@@ -49,17 +85,15 @@ function getCartInfo() {
         .children()
         .eq(2)
         .text(),
-      productPrice: $(el)
+      price: $(el)
         .children()
         .eq(3)
-        .text(),
+        .text()
+        .match(/\d+/g)
+        .join("."),
       discount: $(el)
         .children()
         .eq(4)
-        .text(),
-      totalPrice: $(el)
-        .children()
-        .eq(5)
         .text()
     });
   });
@@ -81,12 +115,17 @@ function getParam() {
 
   return result;
 }
-
+/*
 function triggerPageEvent() {
   var pageName = getPageName();
   var params = getParam();
 
   if (pageName === "Checkout4") {
+    window.dataLayer.push({
+      ecommerce: {
+        purchase: getCartInfo()
+      }
+    });
     // specific event listener for checkout4 Page
     $("#checkout button").on("click", function() {
       $(document).trigger("conversion", params);
@@ -94,8 +133,36 @@ function triggerPageEvent() {
   } else {
     $(document).trigger("view:" + pageName, params);
   }
-}
+}*/
+function triggerPageEvent() {
+  var pageName = getPageName();
+  var params = getParam();
 
+  if (pageName === "Checkout4") {
+    window.dataLayer.push({
+      ecommerce: {
+        purchase: getCartInfo()
+      }
+    });
+    // specific event listener for checkout4 Page
+    $("#checkout button").on("click", function() {
+      $(document).trigger("conversion", params);
+    });
+  } else {
+    if (pageName === "Basket") {
+      window.dataLayer.push({
+        ecommerce: {
+          checkout: {
+            actionField: {
+              step: 1
+            }
+          }
+        }
+      });
+    }
+    $(document).trigger("view:" + pageName, params);
+  }
+}
 $(document).on("view:ProductPage", function(event, params) {
   console.log("The first parameter that I received is: ");
   console.log(event);
